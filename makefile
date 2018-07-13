@@ -77,13 +77,13 @@ WARNINGS  = -Wall -Wextra -Wshadow -Wlogical-op -Wfloat-equal \
             -Wdouble-promotion -Wduplicated-cond -Wlogical-op -Wswitch \
             -Wnull-dereference -Wold-style-cast -Wuseless-cast -Wformat=2 \
             -Wundef -Wconversion -Woverloaded-virtual -Wsuggest-final-types \
-            -Wsuggest-final-methods -Wsuggest-override \
-            -Wframe-larger-than=1024
+            -Wsuggest-final-methods -Wsuggest-override
 DEFINES   = -DARM_MATH_CM4=1 -D__FPU_PRESENT=1U
 DISABLED_WARNINGS = -Wno-main -Wno-variadic-macros
 COMMON_FLAGS = $(CORTEX_M4F) $(OPTIMIZE) $(DEBUG) $(WARNINGS)  $(DEFINES) \
                $(DISABLED_WARNINGS)
 CFLAGS_COMMON = $(COMMON_FLAGS) \
+    -I"$(CURRENT_DIRECTORY)/" \
     -I"$(LIB_DIR)/" \
     -I"$(LIB_DIR)/newlib" \
     -I"$(LIB_DIR)/third_party/" \
@@ -101,9 +101,9 @@ CFLAGS = -fprofile-arcs -fPIC -fexceptions -fno-inline \
          -ftest-coverage --coverage \
          -fno-elide-constructors \
          $(filter-out $(CORTEX_M4F) $(OPTIMIZE), $(CFLAGS_COMMON)) \
-         -O3
+         -O0
 else
-CFLAGS = $(CFLAGS_COMMON)
+CFLAGS = $(CFLAGS_COMMON) -Wframe-larger-than=2048
 endif
 
 LINKFLAGS = $(COMMON_FLAGS) \
@@ -342,7 +342,7 @@ telemetry:
 	python $(TOOLS)/Telemetry/telemetry.py"
 
 lint:
-	python $(TOOLS)/cpplint/cpplint.py $(LIBRARIES) $(SOURCES)
+	python $(TOOLS)/cpplint/cpplint.py $(LIBRARIES) $(SOURCES) $(TESTS)
 
 test: $(COVERAGE) $(TEST_EXEC)
 	@valgrind --leak-check=full --track-origins=yes -v $(TEST_EXEC) -s
